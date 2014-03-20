@@ -26,7 +26,7 @@ if(PC_LIBZMQ_VERSION)
 elseif(LIBZMQ_INCLUDE_DIR AND EXISTS "${LIBZMQ_INCLUDE_DIR}/zmq.h")
     file(STRINGS "${LIBZMQ_INCLUDE_DIR}/zmq.h" libzmq_ver
          REGEX "^#define[\t ]+ZMQ_VERSION_")
-    message("libzmq_ver = ${libzmq_ver})
+    message("libzmq_ver = ${libzmq_ver}")
 endif()
 
 # handle the QUIETLY and REQUIRED arguments and set OPENAL_FOUND to TRUE if

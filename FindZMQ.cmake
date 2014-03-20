@@ -49,8 +49,6 @@ if(WIN32)
 )
     set(_lzmq_deb zmq${_tgt_COMPILER}-mt-gd-${LIBZMQ_VERSION_MAJOR}_${LIBZMQ_VERSION_MINOR}_${LIBZMQ_VERSION_PATCH}
 )
-    message("_lzmq_rel = ${_lzmq_rel} _lzmq_deb = ${_lzmq_deb}")
-
     find_library(LIBZMQ_LIBRARY_RELEASE NAMES ${_lzmq_rel} lib${_lzmq_rel}
         HINTS
             ${ZMQ_ROOT}/lib

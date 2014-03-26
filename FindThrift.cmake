@@ -30,7 +30,7 @@ find_path(THRIFT_INCLUDE_DIR
 # prefer the thrift version supplied in THRIFT_HOME
 find_library(THRIFT_LIB
     NAMES
-        thrift
+        thrift libthrift
     HINTS
         ${THRIFT_HOME}
         ENV THRIFT_HOME
@@ -56,17 +56,18 @@ if (THRIFT_LIB AND THRIFT_INCLUDE_DIR AND THRIFT_COMPILER)
     set(THRIFT_FOUND TRUE)
     set(THRIFT_LIBS ${THRIFT_LIB})
     exec_program(${THRIFT_COMPILER}
-        ARGS -version OUTPUT_VARIABLE THRIFT_VERSION RETURN_VALUE THRIFT_RETURN)
+        ARGS -version OUTPUT_VARIABLE THRIFT_VERSION_OUT RETURN_VALUE THRIFT_RETURN)
+    string(REGEX MATCH "[0-9]+.[0-9]+.[0-9]+-[a-z]+$" THRIFT_VERSION ${THRIFT_VERSION_OUT})
 else ()
     set(THRIFT_FOUND FALSE)
 endif ()
 
 if (THRIFT_FOUND)
     if (NOT THRIFT_FIND_QUIETLY)
-        message(STATUS "-- Found Thrift version: ${THRIFT_VERSION}")
+        message(STATUS "Found Thrift version: ${THRIFT_VERSION}")
     endif ()
 else ()
-    message(STATUS "-- Thrift compiler/libraries NOT found. ")
+    message(STATUS "Thrift compiler/libraries NOT found. ")
 endif ()
 
 

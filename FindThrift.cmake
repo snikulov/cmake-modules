@@ -28,7 +28,7 @@ find_path(THRIFT_INCLUDE_DIR
 #)
 
 # prefer the thrift version supplied in THRIFT_HOME
-find_library(THRIFT_LIB
+find_library(THRIFT_LIBRARIES
     NAMES
         thrift libthrift
     HINTS
@@ -52,29 +52,13 @@ find_program(THRIFT_COMPILER
         bin bin64
 )
 
-if (THRIFT_LIB AND THRIFT_INCLUDE_DIR AND THRIFT_COMPILER)
-    set(THRIFT_FOUND TRUE)
-    set(THRIFT_LIBS ${THRIFT_LIB})
+if (THRIFT_COMPILER)
     exec_program(${THRIFT_COMPILER}
-        ARGS -version OUTPUT_VARIABLE THRIFT_VERSION_OUT RETURN_VALUE THRIFT_RETURN)
-    string(REGEX MATCH "[0-9]+.[0-9]+.[0-9]+-[a-z]+$" THRIFT_VERSION ${THRIFT_VERSION_OUT})
-else ()
-    set(THRIFT_FOUND FALSE)
-endif ()
-
-if (THRIFT_FOUND)
-    if (NOT THRIFT_FIND_QUIETLY)
-        message(STATUS "Found Thrift version: ${THRIFT_VERSION}")
-    endif ()
-else ()
-    message(STATUS "Thrift compiler/libraries NOT found. ")
+        ARGS -version OUTPUT_VARIABLE __thrift_OUT RETURN_VALUE THRIFT_RETURN)
+    string(REGEX MATCH "[0-9]+.[0-9]+.[0-9]+-[a-z]+$" THRIFT_VERSION_STRING ${__thrift_OUT})
 endif ()
 
 
-mark_as_advanced(
-    THRIFT_LIB
-    THRIFT_LIBS
-    THRIFT_COMPILER
-    THRIFT_INCLUDE_DIR
-    THRIFT_VERSION
-)
+include(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(THRIFT DEFAULT_MSG THRIFT_LIBRARIES THRIFT_INCLUDE_DIR THRIFT_COMPILER)
+mark_as_advanced(THRIFT_LIBRARIES THRIFT_INCLUDE_DIR THRIFT_COMPILER THRIFT_VERSION_STRING)

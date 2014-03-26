@@ -9,8 +9,8 @@ find_path(LIBZMQ_INCLUDE_DIR NAMES zmq.h zmq_utils.h
     HINTS
         ${PC_LIBZMQ_INCLUDEDIR}
         ${PC_LIBZMQ_INCLUDE_DIRS}
-        ${ZMQ_ROOT}/include
-        ${LIBZMQ_ROOT}/include
+        ${ZMQ_HOME}/include
+        ${LIBZMQ_HOME}/include
     )
 
 if(PC_LIBZMQ_VERSION)
@@ -21,8 +21,6 @@ elseif(LIBZMQ_INCLUDE_DIR AND EXISTS "${LIBZMQ_INCLUDE_DIR}/zmq.h")
     string(REGEX REPLACE ".*#define[\t ]+ZMQ_VERSION_MINOR[\t ]+([0-9]+).*" "\\1" LIBZMQ_VERSION_MINOR "${libzmq_ver}")
     string(REGEX REPLACE ".*#define[\t ]+ZMQ_VERSION_PATCH[\t ]+([0-9]+).*" "\\1" LIBZMQ_VERSION_PATCH "${libzmq_ver}")
     set(LIBZMQ_VERSION_STRING "${LIBZMQ_VERSION_MAJOR}.${LIBZMQ_VERSION_MINOR}.${LIBZMQ_VERSION_PATCH}")
-
-    message("LibZMQ ver: ${LIBZMQ_VERSION_STRING}")
 
 endif()
 
@@ -51,14 +49,14 @@ if(WIN32)
 )
     find_library(LIBZMQ_LIBRARY_RELEASE NAMES ${_lzmq_rel} lib${_lzmq_rel}
         HINTS
-            ${ZMQ_ROOT}/lib
-            ${LIBZMQ_ROOT}/lib
+            ${ZMQ_HOME}/lib
+            ${LIBZMQ_HOME}/lib
         )
 
     find_library(LIBZMQ_LIBRARY_DEBUG NAMES ${_lzmq_deb} lib${_lzmq_deb}
         HINTS
-            ${ZMQ_ROOT}/lib
-            ${LIBZMQ_ROOT}/lib
+            ${ZMQ_HOME}/lib
+            ${LIBZMQ_HOME}/lib
         )
     if(LIBZMQ_CMAKE_DEBUG)
         message("LIBZMQ_LIBRARY_RELEASE = ${LIBZMQ_LIBRARY_RELEASE}")
@@ -76,8 +74,8 @@ else()
         HINTS
             ${PC_LIBZMQ_LIBDIR}
             ${PC_LIBZMQ_LIBRARY_DIRS}
-            ${ZMQ_ROOT}/lib
-            ${LIBZMQ_ROOT}/lib
+            ${ZMQ_HOME}/lib
+            ${LIBZMQ_HOME}/lib
         )
 endif()
 

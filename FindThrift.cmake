@@ -1,10 +1,12 @@
 # - Find Thrift (a cross platform RPC lib/tool)
 # This module defines
-#  THRIFT_VERSION, version string of ant if found
+#  THRIFT_VERSION_STRING, version string of ant if found
+#  THRIFT_LIBRARIES, libraries to link
 #  THRIFT_INCLUDE_DIR, where to find THRIFT headers
-#  THRIFT_CONTRIB_DIR, where contrib thrift files (e.g. fb303.thrift) are installed
-#  THRIFT_LIBS, THRIFT libraries
+#  THRIFT_COMPILER, thrift compiler executable
 #  THRIFT_FOUND, If false, do not try to use ant
+# Function
+#  thrift_gen_cpp(<path to thrift file> <output variable with file list>)
 #
 # Initial work was done by Cloudera https://github.com/cloudera/Impala
 # 2014 - modified by snikulov
@@ -21,11 +23,6 @@ find_path(THRIFT_INCLUDE_DIR
     PATH_SUFFIXES
         include
 )
-# TODO: not needed for us
-#find_path(THRIFT_CONTRIB_DIR share/fb303/if/fb303.thrift HINTS
-#  $ENV{THRIFT_HOME}
-#  /usr/local/
-#)
 
 # prefer the thrift version supplied in THRIFT_HOME
 find_library(THRIFT_LIBRARIES
@@ -56,6 +53,31 @@ if (THRIFT_COMPILER)
     exec_program(${THRIFT_COMPILER}
         ARGS -version OUTPUT_VARIABLE __thrift_OUT RETURN_VALUE THRIFT_RETURN)
     string(REGEX MATCH "[0-9]+.[0-9]+.[0-9]+-[a-z]+$" THRIFT_VERSION_STRING ${__thrift_OUT})
+
+    # define utility function to generate cpp files
+    function(thrift_gen_cpp thrift_file THRIFT_CPP_FILES_LIST)
+        set(_res)
+        if(EXISTS ${thrift_file})
+            get_filename_component(_target_dir ${thrift_file} NAME_WE)
+            message("thrif_gen_cpp: ${thrift_file}")
+
+            if(NOT EXISTS ${CMAKE_BINARY_DIR}/${_target_dir})
+                file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${_target_dir})
+            endif()
+
+            exec_program(${THRIFT_COMPILER}
+                ARGS -o "${CMAKE_BINARY_DIR}/${_target_dir}" --gen cpp ${thrift_file}
+                OUTPUT_VARIABLE __thrift_OUT
+                RETURN_VALUE THRIFT_RETURN)
+            file(GLOB_RECURSE __result_src "${CMAKE_BINARY_DIR}/${_target_dir}/*.cpp")
+            file(GLOB_RECURSE __result_hdr "${CMAKE_BINARY_DIR}/${_target_dir}/*.h")
+            list(APPEND _res ${__result_src})
+            list(APPEND _res ${__result_hdr})
+        else()
+            message("thrift_gen_cpp: file ${thrift_file} does not exists")
+        endif()
+        set(${THRIFT_CPP_FILES_LIST} "${_res}" PARENT_SCOPE)
+    endfunction()
 endif ()
 
 

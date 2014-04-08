@@ -55,8 +55,9 @@ if (THRIFT_COMPILER)
     string(REGEX MATCH "[0-9]+.[0-9]+.[0-9]+-[a-z]+$" THRIFT_VERSION_STRING ${__thrift_OUT})
 
     # define utility function to generate cpp files
-    function(thrift_gen_cpp thrift_file THRIFT_CPP_FILES_LIST)
+    function(thrift_gen_cpp thrift_file THRIFT_CPP_FILES_LIST THRIFT_GEN_INCLUDE_DIR)
         set(_res)
+        set(_res_inc_path)
         if(EXISTS ${thrift_file})
             get_filename_component(_target_dir ${thrift_file} NAME_WE)
             message("thrif_gen_cpp: ${thrift_file}")
@@ -64,7 +65,6 @@ if (THRIFT_COMPILER)
             if(NOT EXISTS ${CMAKE_BINARY_DIR}/${_target_dir})
                 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${_target_dir})
             endif()
-
             exec_program(${THRIFT_COMPILER}
                 ARGS -o "${CMAKE_BINARY_DIR}/${_target_dir}" --gen cpp ${thrift_file}
                 OUTPUT_VARIABLE __thrift_OUT
@@ -73,10 +73,15 @@ if (THRIFT_COMPILER)
             file(GLOB_RECURSE __result_hdr "${CMAKE_BINARY_DIR}/${_target_dir}/*.h")
             list(APPEND _res ${__result_src})
             list(APPEND _res ${__result_hdr})
+            if(__result_hdr)
+                list(GET __result_hdr 0 _res_inc_path)
+                get_filename_component(_res_inc_path ${_res_inc_path} DIRECTORY)
+            endif()
         else()
             message("thrift_gen_cpp: file ${thrift_file} does not exists")
         endif()
         set(${THRIFT_CPP_FILES_LIST} "${_res}" PARENT_SCOPE)
+        set(${THRIFT_GEN_INCLUDE_DIR} "${_res_inc_path}" PARENT_SCOPE)
     endfunction()
 endif ()
 

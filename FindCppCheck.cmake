@@ -1,3 +1,21 @@
+#
+# FindCppCheck.cmake
+#
+# This file is based on following work https://cmake.org/Wiki/PC-Lint
+#
+# (C) 2015 by Sergei Nikulov
+
+#
+# Variables defined:
+#    CPPCHECK_FOUND - ON/OFF - found/not found
+#    CPPCHECK_EXECUTABLE - path to cppcheck if found
+#
+# Function defined:
+#    add_cppcheck(<target>) target to check with cppcheck
+#      this function will define build target named <target>_CPPCHECK,
+#      to run static analysis agains source files from target.
+#
+
 set(WHINTS
     "$ENV{ProgramFiles}/Cppcheck"
     "$ENV{ProgramW6432}/Cppcheck"

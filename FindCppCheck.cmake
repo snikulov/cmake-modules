@@ -1,4 +1,13 @@
-find_program(CPPCHECK_EXECUTABLE cppcheck DOC "Path to cppcheck executable")
+set(WHINTS
+    "$ENV{ProgramFiles}/Cppcheck"
+    "$ENV{ProgramW6432}/Cppcheck"
+)
+
+find_program(CPPCHECK_EXECUTABLE NAMES cppcheck
+    HINTS ${WHINTS} ENV PATH
+    PATHS ${WHINTS} ENV PATH
+    DOC "Path to cppcheck executable")
+
 mark_as_advanced(CPPCHECK_EXECUTABLE)
 
 if(CPPCHECK_EXECUTABLE)
@@ -29,15 +38,33 @@ if(CPPCHECK_FOUND)
 
     add_custom_target(ALL_CPPCHECK)
 
+    #detect platform flag
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(_platform_bits "64")
+    else()
+        if(WIN32)
+            set(_platform_bits "32A")
+        else()
+            set(_platform_bits "32")
+        endif()
+    endif()
+
+    set(_cc_platform "native")
+    if(WIN32)
+        set(_cc_platform "win${_platform_bits}")
+    elseif(UNIX)
+        set(_cc_platform "unix${_platform_bits}")
+    endif()
+
+
     function(add_cppcheck _target_name)
         get_target_property(_cc_includes ${_target_name} INCLUDE_DIRECTORIES)
         get_target_property(_cc_defines ${_target_name} COMPILE_DEFINITIONS)
         get_target_property(_cc_sources ${_target_name} SOURCES)
 
-
-        message(STATUS "_cc_includes = ${_cc_includes}")
-        message(STATUS "_cc_defines = ${_cc_defines}")
-        message(STATUS "_cc_sources = ${_cc_sources}")
+#        message(STATUS "_cc_includes = ${_cc_includes}")
+#        message(STATUS "_cc_defines = ${_cc_defines}")
+#        message(STATUS "_cc_sources = ${_cc_sources}")
 
         set(_cc_inc_transformed)
         foreach(_inc_dir ${_cc_includes})
@@ -55,8 +82,8 @@ if(CPPCHECK_FOUND)
                 get_filename_component(_src_abs ${sourcefile} ABSOLUTE)
                 get_filename_component(_src_name ${sourcefile} NAME)
 
-                message(STATUS "_src_abs = ${_src_abs}")
-                message(STATUS "_src_name = ${_src_name}")
+#                message(STATUS "_src_abs = ${_src_abs}")
+#                message(STATUS "_src_name = ${_src_name}")
 
                 set(_rpt_file_name "${_src_name}.rpt")
                 set(_rpt_path "${CMAKE_CURRENT_SOURCE_DIR}/cppcheck/reports/${_target_name}")
@@ -66,7 +93,7 @@ if(CPPCHECK_FOUND)
 
                 add_custom_command(OUTPUT ${_rpt_dst}
                     COMMAND
-                    ${CPPCHECK_EXECUTABLE} --enable=all ${_cc_inc_transformed} ${_cc_def_transformed} ${_src_abs} > ${_rpt_dst}
+                    ${CPPCHECK_EXECUTABLE} --enable=all --inconclusive --platform=${_cc_platform} ${_cc_inc_transformed} ${_cc_def_transformed} ${_src_abs} > ${_rpt_dst} 2>&1
                     VERBATIM
                     )
                 list(APPEND _all_rpts ${_rpt_dst})

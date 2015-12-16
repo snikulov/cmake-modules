@@ -56,6 +56,11 @@ if(CPPCHECK_FOUND)
 
     add_custom_target(ALL_CPPCHECK)
 
+    # boost cstdint usage required this definiton
+    list(APPEND PROJECT_COMMON_DEFS "UCHAR_MAX=255")
+    list(APPEND PROJECT_COMMON_DEFS "BOOST_HAS_STDINT_H")
+    list(APPEND PROJECT_COMMON_DEFS "BOOST_HAS_LONG_LONG")
+
     #detect platform flag
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(_platform_bits "64")
@@ -68,8 +73,13 @@ if(CPPCHECK_FOUND)
     endif()
 
     set(_cc_platform "native")
-    if(WIN32)
 
+    if(WIN32)
+        list(APPEND PROJECT_COMMON_DEFS "_MSC_VER=1800")
+        list(APPEND PROJECT_COMMON_DEFS "_MSC_FULL_VER=180040629")
+        list(APPEND PROJECT_COMMON_DEFS "_MSC_EXTENSIONS")
+        list(APPEND PROJECT_COMMON_DEFS "ULLONG_MAX=18446744073709551615ULL")
+        list(APPEND PROJECT_COMMON_DEFS "BOOST_WINDOWS")
         list(APPEND PROJECT_COMMON_DEFS "_WIN32")
         list(APPEND PROJECT_COMMON_DEFS "WIN32")
         list(APPEND PROJECT_COMMON_DEFS "_WINDOWS")

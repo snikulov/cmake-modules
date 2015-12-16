@@ -19,7 +19,7 @@
 set(WHINTS
     "$ENV{ProgramFiles}/Cppcheck"
     "$ENV{ProgramW6432}/Cppcheck"
-)
+    )
 
 find_program(CPPCHECK_EXECUTABLE NAMES cppcheck
     HINTS ${WHINTS} ENV PATH
@@ -69,6 +69,11 @@ if(CPPCHECK_FOUND)
 
     set(_cc_platform "native")
     if(WIN32)
+
+        list(APPEND PROJECT_COMMON_DEFS "_WIN32")
+        list(APPEND PROJECT_COMMON_DEFS "WIN32")
+        list(APPEND PROJECT_COMMON_DEFS "_WINDOWS")
+
         set(_cc_platform "win${_platform_bits}")
     elseif(UNIX)
         set(_cc_platform "unix${_platform_bits}")
@@ -77,12 +82,18 @@ if(CPPCHECK_FOUND)
 
     function(add_cppcheck _target_name)
         get_target_property(_cc_includes ${_target_name} INCLUDE_DIRECTORIES)
-        get_target_property(_cc_defines ${_target_name} COMPILE_DEFINITIONS)
+        #        get_target_property(_cc_includes ${_target_name} CXX_INCLUDE_WHAT_YOU_USE)
+        #        get_target_property(_cc_defines ${_target_name} COMPILE_DEFINITIONS)
         get_target_property(_cc_sources ${_target_name} SOURCES)
+        get_directory_property(_cc_defines COMPILE_DEFINITIONS)
 
-#        message(STATUS "_cc_includes = ${_cc_includes}")
-#        message(STATUS "_cc_defines = ${_cc_defines}")
-#        message(STATUS "_cc_sources = ${_cc_sources}")
+        if(PROJECT_COMMON_DEFS)
+            list(APPEND _cc_defines ${PROJECT_COMMON_DEFS})
+        endif()
+
+        #        message(STATUS "_cc_includes = ${_cc_includes}")
+        #        message(STATUS "_cc_defines = ${_cc_defines}")
+        #        message(STATUS "_cc_sources = ${_cc_sources}")
 
         set(_cc_inc_transformed)
         foreach(_inc_dir ${_cc_includes})
@@ -94,14 +105,19 @@ if(CPPCHECK_FOUND)
             list(APPEND _cc_def_transformed -D${_one_def})
         endforeach()
 
+        #        message(STATUS "_cc_inc_transformed = ${_cc_inc_transformed}")
+        #        message(STATUS "_cc_def_transformed = ${_cc_def_transformed}")
+        #        message(STATUS "CMAKE_SYSTEM_INCLUDE_PATH = ${CMAKE_SYSTEM_INCLUDE_PATH}")
+        #        message(STATUS "CMAKE_INCLUDE_PATH = ${CMAKE_INCLUDE_PATH}")
+
         set(_all_rpts)
         foreach(sourcefile ${_cc_sources})
             if(sourcefile MATCHES \\.c$|\\.cxx$|\\.cpp$|\\.cc$)
                 get_filename_component(_src_abs ${sourcefile} ABSOLUTE)
                 get_filename_component(_src_name ${sourcefile} NAME)
 
-#                message(STATUS "_src_abs = ${_src_abs}")
-#                message(STATUS "_src_name = ${_src_name}")
+                #                message(STATUS "_src_abs = ${_src_abs}")
+                #                message(STATUS "_src_name = ${_src_name}")
 
                 set(_rpt_file_name "${_src_name}.rpt")
                 set(_rpt_path "${CMAKE_CURRENT_SOURCE_DIR}/cppcheck/reports/${_target_name}")

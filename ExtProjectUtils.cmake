@@ -1,4 +1,5 @@
 include(ExternalProject)
+include(CMakeParseArguments)
 
 #
 # Function to inject dependency (download from git repo)

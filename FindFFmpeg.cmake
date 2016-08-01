@@ -13,7 +13,7 @@
 #   - AVFORMAT
 #   - AVFILTER
 #   - AVUTIL
-#   - POSTPROCESS
+#   - POSTPROC
 #   - SWSCALE
 # the following variables will be defined
 #  <component>_FOUND        - System has <component>
@@ -99,13 +99,14 @@ endmacro()
 if (NOT FFMPEG_LIBRARIES)
 
   # Check for all possible component.
-  find_component(AVCODEC  libavcodec  avcodec  libavcodec/avcodec.h)
-  find_component(AVFORMAT libavformat avformat libavformat/avformat.h)
-  find_component(AVDEVICE libavdevice avdevice libavdevice/avdevice.h)
-  find_component(AVUTIL   libavutil   avutil   libavutil/avutil.h)
-  find_component(AVFILTER libavfilter avfilter libavfilter/avfilter.h)
-  find_component(SWSCALE  libswscale  swscale  libswscale/swscale.h)
-  find_component(POSTPROC libpostproc postproc libpostproc/postprocess.h)
+  find_component(AVCODEC    libavcodec    avcodec  libavcodec/avcodec.h)
+  find_component(AVFORMAT   libavformat   avformat libavformat/avformat.h)
+  find_component(AVDEVICE   libavdevice   avdevice libavdevice/avdevice.h)
+  find_component(AVUTIL     libavutil     avutil   libavutil/avutil.h)
+  find_component(AVFILTER   libavfilter   avfilter libavfilter/avfilter.h)
+  find_component(SWSCALE    libswscale    swscale  libswscale/swscale.h)
+  find_component(POSTPROC   libpostproc   postproc libpostproc/postprocess.h)
+  find_component(SWRESAMPLE libswresample swresample libswresample/swresample.h)
 
   # Check if the required components were found and add their stuff to the FFMPEG_* vars.
   foreach (_component ${FFmpeg_FIND_COMPONENTS})

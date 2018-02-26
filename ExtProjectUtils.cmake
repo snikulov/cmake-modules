@@ -16,7 +16,8 @@ function(ExtProjectGit repourl tag destination)
 
     message(STATUS "Get external project from: ${repourl} : ${tag}")
 
-    string(REGEX MATCH "([^\/]+)\.git$" _name ${repourl})
+    string(REGEX MATCH "([^\\/]+)[.]git$" _name ${repourl})
+    message(STATUS "_name = ${_name}")
 
     set(options)
     set(oneValueArgs)
@@ -25,17 +26,25 @@ function(ExtProjectGit repourl tag destination)
 
     set(cmake_cli_args -DCMAKE_INSTALL_PREFIX=${destination}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+    if(CMAKE_TOOLCHAIN_FILE)
+        get_filename_component(_ft_path ${CMAKE_TOOLCHAIN_FILE} ABSOLUTE)
+        get_filename_component(_cm_rt_opath ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ABSOLUTE)
+        set(cmake_cli_args ${cmake_cli_args}
+          -DCMAKE_TOOLCHAIN_FILE=${_ft_path}
+          -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${_cm_rt_opath})
+    endif()
+
     foreach(cmake_key ${ExtProjectGit_CMAKE_ARGS})
         set(cmake_cli_args ${cmake_key} ${cmake_cli_args})
     endforeach()
 
     message(STATUS "ARGS for ExternalProject_Add(${name}): ${cmake_cli_args}")
+    message(STATUS "CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
 
     ExternalProject_Add(${_name}
         GIT_REPOSITORY ${repourl}
         GIT_TAG ${tag}
-        CMAKE_ARGS ${cmake_cli_args}
+        CMAKE_ARGS -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} ${cmake_cli_args} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
         PREFIX "${destination}"
         INSTALL_DIR "${destination}")
-
 endfunction()

@@ -1,15 +1,16 @@
 # - Find Thrift (a cross platform RPC lib/tool)
 # This module defines
-#  THRIFT_VERSION_STRING, version string of ant if found
+#  THRIFT_VERSION_STRING, version string of thrift if found
 #  THRIFT_LIBRARIES, libraries to link
 #  THRIFT_INCLUDE_DIR, where to find THRIFT headers
 #  THRIFT_COMPILER, thrift compiler executable
-#  THRIFT_FOUND, If false, do not try to use ant
+#  THRIFT_FOUND, If false, do not try to use Thrift
 # Function
 #  thrift_gen_cpp(<path to thrift file> <output variable with file list>)
 #
 # Initial work was done by Cloudera https://github.com/cloudera/Impala
 # 2014 - modified by snikulov
+# 2017 - Added correct setting of THRIFT_FOUND by Garandor
 
 # prefer the thrift version supplied in THRIFT_HOME (cmake -DTHRIFT_HOME then environment)
 find_path(THRIFT_INCLUDE_DIR
@@ -84,6 +85,10 @@ if (THRIFT_COMPILER)
         set(${THRIFT_GEN_INCLUDE_DIR} "${_res_inc_path}" PARENT_SCOPE)
     endfunction()
 endif ()
+
+if( THRIFT_LIBRARIES AND THRIFT_INCLUDE_DIR )
+	SET(THRIFT_FOUND)
+endif()
 
 
 include(FindPackageHandleStandardArgs)
